@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WeatherApp - Аналитика погоды</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: 'Courier New', monospace; margin: 20px; background: #1e1e1e; color: #ffffff; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .status { background: #2d2d2d; padding: 15px; border-radius: 5px; margin: 10px 0; border-left: 4px solid #4CAF50; }
+        .analytics-section { background: #2d2d2d; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .city-analytics { margin: 20px 0; }
+        .city-block { background: #3d3d3d; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #2196F3; }
+        .city-name { font-size: 18px; font-weight: bold; color: #4CAF50; margin-bottom: 10px; }
+        .city-stats { font-family: 'Courier New', monospace; line-height: 1.6; }
+        .stat-line { margin: 5px 0; }
+        .summary-section { background: #3d3d3d; padding: 15px; border-radius: 5px; margin: 20px 0; border-left: 4px solid #FF9800; }
+        .summary-title { font-size: 18px; font-weight: bold; color: #FF9800; margin-bottom: 10px; }
+        .controls { text-align: center; margin: 20px 0; }
+        button { background: #4CAF50; color: white; padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #45a049; }
+        .refresh-info { text-align: center; color: #888; margin: 20px 0; }
+        .divider { border-top: 1px solid #555; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌤️ WeatherApp - Аналитика погоды</h1>
+        </div>
+        
+        <div class="status">
+            <h2>✅ Приложение работает</h2>
+            <p>Время: <span th:text="${currentTime}">2024-01-15 17:30:00</span></p>
+        </div>
+
+        <div class="analytics-section">
+            <h2>=== АНАЛИТИКА ПОГОДЫ ===</h2>
+            
+            <div class="city-analytics" th:if="${detailedAnalytics.cityAnalytics}">
+                <div class="city-block" th:each="city : ${detailedAnalytics.cityAnalytics}">
+                    <div class="city-name" th:text="'Город: ' + ${city.city}">Город: Москва</div>
+                    <div class="city-stats">
+                        <div class="stat-line" th:text="'  - Всего записей: ' + ${city.totalRecords}">- Всего записей: 1</div>
+                        <div class="stat-line" th:text="'  - Солнечных дней: ' + ${city.sunnyDays}">- Солнечных дней: 0</div>
+                        <div class="stat-line" th:text="'  - Дождливых дней: ' + ${city.rainyDays}">- Дождливых дней: 0</div>
+                        <div class="stat-line" th:text="'  - Облачных дней: ' + ${city.cloudyDays}">- Облачных дней: 1</div>
+                        <div class="stat-line" th:text="'  - Средняя температура: ' + ${city.avgTemperature} + '°C'">- Средняя температура: 20.0°C</div>
+                        <div class="stat-line" th:text="'  - Максимальная температура: ' + ${city.maxTemperature} + '°C'">- Максимальная температура: 25.0°C</div>
+                        <div class="stat-line" th:text="'  - Минимальная температура: ' + ${city.minTemperature} + '°C'">- Минимальная температура: 15.0°C</div>
+                        <div class="stat-line" th:if="${city.hottestDay}" th:text="'  - Самая жаркая погода: ' + ${city.hottestDay}">- Самая жаркая погода: 25.0°C солнечно</div>
+                        <div class="stat-line" th:if="${city.coldestDay}" th:text="'  - Самая холодная погода: ' + ${city.coldestDay}">- Самая холодная погода: 15.0°C облачно</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="summary-section">
+                <div class="summary-title">=== ОБЩАЯ СТАТИСТИКА ===</div>
+                <div class="city-stats">
+                    <div class="stat-line" th:text="'Город с самым большим количеством дождливых дней: ' + ${detailedAnalytics.cityWithMostRain}">Город с самым большим количеством дождливых дней: Москва</div>
+                    <div class="stat-line" th:text="'Город с самой высокой средней температурой: ' + ${detailedAnalytics.cityWithHighestAvgTemp}">Город с самой высокой средней температурой: Москва</div>
+                    <div class="stat-line" th:text="'Город с самой низкой средней температурой: ' + ${detailedAnalytics.cityWithLowestAvgTemp}">Город с самой низкой средней температурой: Москва</div>
+                </div>
+            </div>
+            
+            <div class="divider"></div>
+            <div class="stat-line" style="text-align: center;">=====================================</div>
+        </div>
+
+        <div class="controls">
+            <form method="post" action="/generate" style="display: inline;">
+                <button type="submit">🔄 Сгенерировать новые данные</button>
+            </form>
+            <button onclick="location.reload()">🔄 Обновить страницу</button>
+        </div>
+
+        <div class="refresh-info">
+            <p><small>💡 Данные генерируются каждые 2 секунды, аналитика обновляется каждые 10 секунд</small></p>
+            <p><small>🔄 Обновите страницу для получения свежих данных</small></p>
+        </div>
+    </div>
+
+    <script>
+        // Автообновление каждые 30 секунд
+        setTimeout(() => {
+            location.reload();
+        }, 30000);
+    </script>
+</body>
+</html>
