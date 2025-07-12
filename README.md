@@ -45,7 +45,7 @@ docker-compose up -d
 ### Открыть веб-интерфейс
 ```bash
 # Откройте в браузере
-http://localhost:8080/
+http://localhost:8081/
 ```
 
 ## Конфигурация
